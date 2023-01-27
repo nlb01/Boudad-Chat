@@ -8,7 +8,7 @@ const formatMessage = require('./utils/messages')
 const server = http.createServer(app)
 const io = socketio(server)
 const botName = 'ChatBotCord'
-const {userJoin , getCurrentUser} = require('./utils/users')
+const {userJoin , getCurrentUser, getRoomUsers , userLeave} = require('./utils/users')
 
 
 //Set static folder
@@ -26,8 +26,13 @@ io.on('connection', socket => {
 
         //Broadcast when user connects
         socket.broadcast.to(user.room).emit(
-            'message' , formatMessage(botName , 'a user has joined the chat'))
+            'message' , formatMessage(botName , user.username + ' has joined the chat'))
         
+        // send users and room info
+        io.to(user.room).emit('roomUsers', {
+            room: user.room,
+            users: getRoomUsers(user.room)
+        })
     })
     /////socket.emit (only to the client or user)
     /////socket.broadcast.emit (to all other clients or users exceot the active one)
@@ -36,13 +41,23 @@ io.on('connection', socket => {
 
     //listen for chat message
     socket.on('chatMessage' , (msg) => {
-        io.emit('message' , formatMessage('User',msg))
+        const user = getCurrentUser(socket.id)
+        io.to(user.room).emit('message' , formatMessage( user.username ,msg))
 
     })
 
     //runs when a user disconnects
     socket.on('disconnect' , () => {
-        io.emit('message' , formatMessage(botName, 'A use has left the chat'))
+        const user = userLeave(socket.id)
+
+        if(user) {
+            io.to(user.room).emit('message' , formatMessage(botName, user.username + ' has left the chat'))
+            io.to(user.room).emit('roomUsers', {
+                room: user.room,
+                users: getRoomUsers(user.room)
+            })
+        }
+        
     })
 
 })
