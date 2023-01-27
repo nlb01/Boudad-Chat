@@ -38,19 +38,6 @@ chatForm.addEventListener('submit' , (e) => {
 })
 
 
-{/* <div class="chat-sidebar">
-    <h3><i class="fas fa-comments"></i> Room Name:</h3>
-    <h2 id="room-name">JavaScript</h2>
-    <h3><i class="fas fa-users"></i> Users</h3>
-    <ul id="users">
-        <li>Brad</li>
-        <li>John</li>
-        <li>Mary</li>
-        <li>Paul</li>
-        <li>Mike</li>
-    </ul>
-    </div> */}
-
 //Get room and users
 socket.on('roomUsers' , ({room, users}) => {
     outputRoomName(room)
@@ -67,14 +54,6 @@ function outputUsers(users) {
     userList.innerHTML = `${users.map(user => `<li>${user.username}</li>`).join('')}`
 }
 
-
-{/* <div class="message">
-    <p class="meta">Mary <span>9:15pm</span></p>
-    <p class="text">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi,
-        repudiandae.
-    </p>
-</div> */}
 
 //output message to DOM
 function outputMessage(msg){
